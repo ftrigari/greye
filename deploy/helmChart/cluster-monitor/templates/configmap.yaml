@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+
+      "server": {
+        "port": {{ .Values.service.port }},
+        "tlsPort": {{ .Values.service.tlsPort }},
+        "applicationName": "{{ include "clusterMonitor.fullname" . }}",
+        "serviceHAName": "{{ include "clusterMonitor.fullname" . }}",
+        "numberClusterMonitor": {{ .Values.replicaCount }}
+      },
+      "notification": {
+        "telegram": {
+          "destination": "{{ .Values.notification.telegram.destination }}",
+          "token": "{{ .Values.notification.telegram.token }}"
+        },
+        "email": {
+          "destination": "{{ .Values.notification.email.destination }}",
+          "token": "{{ .Values.notification.email.token }}"
+        }
+      },
+      "protocol": [
+        "http"
+      ],
+      "application": {
+        "intervalSeconds": 30,
+        "timeoutSeconds": 5,
+        "protocol": "http",
+        "method": "GET",
+        "headers": "{}",
+        "body": "{}",
+        "port": 80,
+        "maxFailedRequests": 3
+      }
+    }

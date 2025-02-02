@@ -1,0 +1,280 @@
+definitions:
+  clusterMonitor_internal_application_domain_models.RequestInfo:
+    properties:
+      architecture:
+        type: string
+      body: {}
+      headers:
+        $ref: '#/definitions/http.Header'
+      host:
+        type: string
+      interval:
+        $ref: '#/definitions/time.Duration'
+      method:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      paths:
+        items:
+          type: string
+        type: array
+      port:
+        type: string
+      protocol:
+        type: string
+      timeout:
+        $ref: '#/definitions/time.Duration'
+    type: object
+  http.Header:
+    additionalProperties:
+      items:
+        type: string
+      type: array
+    type: object
+  models.EasyResponse:
+    properties:
+      error: {}
+      message:
+        type: string
+    type: object
+  models.SchedulerApplication:
+    properties:
+      body: {}
+      failedRequest:
+        type: integer
+      header:
+        $ref: '#/definitions/http.Header'
+      host:
+        type: string
+      interval:
+        $ref: '#/definitions/time.Duration'
+      maxFailedRequests:
+        type: integer
+      method:
+        type: string
+      name:
+        type: string
+      path:
+        items:
+          type: string
+        type: array
+      port:
+        type: integer
+      protocol:
+        type: string
+      scheduledApplication:
+        type: string
+      timeout:
+        $ref: '#/definitions/time.Duration'
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+info:
+  contact: {}
+paths:
+  /api/v1/application:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User registration information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/clusterMonitor_internal_application_domain_models.RequestInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+      summary: Register a new user
+      tags:
+      - Application
+  /api/v1/application/check:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User registration information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/clusterMonitor_internal_application_domain_models.RequestInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - Application
+  /api/v1/application/monitor:
+    get:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: url
+        example: http://example.com
+        in: query
+        name: url
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/models.SchedulerApplication'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+      summary: Register a new user
+      tags:
+      - Application
+    put:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User registration information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/clusterMonitor_internal_application_domain_models.RequestInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+      summary: Register a new user
+      tags:
+      - Application
+  /api/v1/application/monitor/{service}:
+    delete:
+      consumes:
+      - application/json
+      description: Rimuove il monitoraggio per un'applicazione specifica identificata
+        dal suo nome.
+      parameters:
+      - description: Nome del servizio da rimuovere
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+      summary: Unschedule application monitoring
+      tags:
+      - Application
+  /api/v1/application/monitor/pod:
+    get:
+      consumes:
+      - application/json
+      description: get all applications distinct by pod
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/models.SchedulerApplication'
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.EasyResponse'
+      summary: get monitored applications by pod
+      tags:
+      - Application
+swagger: "2.0"

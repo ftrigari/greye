@@ -1,0 +1,28 @@
+{
+  "server":{
+    "port": 8080,
+    "applicationName": "localhost",
+    "serviceHAName": "cluster-monitor-ha",
+    "numberClusterMonitor": 3
+  },
+  "application": {
+    "intervalSeconds": 30,
+    "timeoutSeconds": 5,
+    "protocol": "http",
+    "method": "GET",
+    "headers": "{}",
+    "body": "{}",
+    "port": 80,
+    "maxFailedRequests": 3
+  },
+
+  "notification": {
+    "telegram": {
+      "destination": "destination",
+      "token": "your-telegram-token"
+    }
+  },
+  "protocol": [
+    "http"
+  ]
+}

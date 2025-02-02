@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}-application
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "clusterMonitor.selectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: cluster-monitor
+  ports:
+    - port: {{ .Values.service.port }}
+      name: http
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}-0
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+      nodePort: 32473
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    "statefulset.kubernetes.io/pod-name": "cm-cluster-monitor-0"
+    {{- include "clusterMonitor.selectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}-1
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      nodePort: 32429
+      protocol: TCP
+      name: http
+  selector:
+    "statefulset.kubernetes.io/pod-name": "cm-cluster-monitor-1"
+    {{- include "clusterMonitor.selectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}-2
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+      nodePort: 32245
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    "statefulset.kubernetes.io/pod-name": "cm-cluster-monitor-2"
+    {{- include "clusterMonitor.selectorLabels" . | nindent 4 }}

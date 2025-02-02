@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "clusterMonitor.fullname" . }}
+  labels:
+    {{- include "clusterMonitor.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+
+  serviceName: {{ include "clusterMonitor.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "clusterMonitor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "clusterMonitor.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "clusterMonitor.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+{{/*          livenessProbe:*/}}
+{{/*            {{- toYaml .Values.livenessProbe | nindent 12 }}*/}}
+{{/*          readinessProbe:*/}}
+{{/*            {{- toYaml .Values.readinessProbe | nindent 12 }}*/}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config  # Il percorso dove vuoi montare la ConfigMap
+              #subPath: config.json   # Se vuoi montare un singolo file, altrimenti rimuovi questa riga per montare tutta la ConfigMap
+            - name: webhook-tls-certs
+              mountPath: /certs/tls
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "clusterMonitor.fullname" . }}
+        - name: webhook-tls-certs
+          secret:
+            secretName: cm-cluster-monitor-tls
